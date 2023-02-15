@@ -1,0 +1,77 @@
+---
+title: "Importing Data"
+author: "Kelly Izzard"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    theme: simplex
+    highlight: tango
+    df_print: paged
+---
+
+# Importing Data
+
+## Set up
+
+```{r setup, message=FALSE,warning=FALSE}
+#librarys
+library(tidyverse)
+library(bcdata)
+library(sf)
+library(terra)
+library(DBI)
+library(RPostgreSQL)
+library(skimr)
+library(knitr)
+library(kableExtra)
+#Postgres connection object
+db = dbConnect(RPostgreSQL::PostgreSQL(), host="localhost", user = "postgres")
+#knitr...read about knitr here: https://sachsmc.github.io/knit-git-markr-guide/knitr/knit.html
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(connection = "db")
+knitr::opts_knit$set(sql.max.print = NA)
+knitr::opts_chunk$set(fig.width = 7,fig.height = 7,collapse = TRUE)
+options(scipen = 999)
+
+
+```
+
+## Objectives
+
+-   Name six functions for reading tabular data and explain their use.
+-   Read CSV data files with multiple header lines, comments, missing headers, and/or markers for missing data.
+-   Explain how data reader functions determine whether they have extra and missing values, and how they handle them.
+-   Name four functions used to parse individual values and explain their use.
+-   Explain how to obtain a summary of parsing problems encountered by data reading functions.
+-   Define *locale* and explain its purpose and use.
+-   Define *encoding* and explain its purpose and use.
+-   Explain how `readr` functions determine column types.
+-   Set the data types of columns explicitly while reading data.
+-   Explain how to write well-formatted tabular data.
+-   Describe what information is lost when writing tibbles to delimited files and what formats can be used instead.
+
+## Importing .csv and .xls files
+
+We'll start by looking at 2 packages for bringing rectangular tabular data into R: [readr](https://readr.tidyverse.org/) which is a core tidyverse package (loads with tidyverse and [readxl](https://readxl.tidyverse.org/#:~:text=The%20readxl%20package%20makes%20it,readxl%20supports%20both%20the%20legacy%20.) which is a tidyverse support package (has to be loaded seperately)
+
+### readr
+
+The goal of readr is to provide a fast and friendly way to read rectangular data from delimited files, such as comma-separated values (CSV) and tab-separated values (TSV). It is designed to parse many types of data found in the wild, while providing an informative problem report when parsing leads to unexpected results. The easiest way to get started (and save some typing) is to use the 'Import Dataset' drop-down menu in the RStudio Environment Quadrant.
+
+```{r import dropdown}
+#copy and paste code here
+vli <- read_csv("../RYouWithMe/data/tsa17/xls/vli.csv")
+
+```
+
+When you run read_csv(), it prints out a message telling you the number of rows and columns of data, the delimiter that was used, and the column specifications (names of columns organized by the type of data the column contains). It also prints out some information about retrieving the full column specification and how to quiet this message.
+
+```{r}
+
+vli_prob <- read_csv("../RYouWithMe/data/tsa17/xls/vli.csv", col_types = list(vli_vsu_number= col_double()))
+View(vli_prob)
+```
+
